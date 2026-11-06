@@ -16,8 +16,8 @@
    xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
      inkscape:document-units="mm"
      inkscape:zoom="2.0000001"
-     inkscape:cx="258.74999"
-     inkscape:cy="208.74999"
+     inkscape:cx="187.74999"
+     inkscape:cy="227.74999"
      id="namedview1"
      pagecolor="#ffffff"
      bordercolor="#000000"
@@ -101,7 +101,7 @@
        inkscape:randomized="0"
        d="m 41.624334,19.266424 24.763309,-6.635308 18.128,18.128 -6.635308,24.763308 -24.763309,6.635309 -18.128,-18.128 z" /><g
        id="g1"
-       transform="matrix(1.0177656,0.25882996,-0.25882996,1.0177656,23.324599,-2.4351951)"><path
+       transform="matrix(0.90599039,0.23040419,-0.23040419,0.90599039,27.532863,2.1904053)"><path
          style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.0904443;stroke-linecap:round;stroke-linejoin:round"
          d="m 38.049732,24.860269 c 3.742075,-2.51659 8.705876,-4.19638 13.244432,-4.342349 1.944368,0.06839 5.30169,0.591873 5.30169,0.591873 L 42.83936,27.155558 Z"
          id="path46"

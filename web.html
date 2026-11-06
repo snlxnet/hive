@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="darkreader-lock" />
+    <title>hive | snlx.net</title>
+    <meta
+      name="description"
+      content="Hive web part"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: inherit;
+        font-size: inherit;
+        margin: 0;
+        padding: 0;
+        color: inherit;
+      }
+      body {
+        height: 100svh;
+        font-family: "comfortaa";
+      }
+      body:has(form) {
+        background: #121212;
+        color: #eee;
+        max-width: 70ch;
+        padding: 1em;
+        margin: auto;
+      }
+      svg,
+      img {
+        width: 100%;
+        height: unset !important;
+      }
+      input {
+        background: #2d2d38;
+        border: 0.1em solid #000000;
+        padding: 0.6em;
+        border-radius: 1em;
+        outline: none;
+      }
+      input:focus {
+        border-color: #a8a5ff;
+      }
+      button {
+        background: #a8a5ff;
+        color: #121212;
+        border: none;
+        font-weight: bold;
+        padding: 0.6em;
+        border-radius: 1em;
+      }
+      form, label {
+        padding-top: 1em;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6em;
+      }
+      form {
+        gap: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="/card.svg">
+
+    <form id="form">
+      <label>
+        This device's name
+        <input name="devid" value="worker-0">
+      </label>
+      <button>Join the network</button>
+    </form>
+
+    <script src="app.js">
+    </script>
+  </body>
+</html>
