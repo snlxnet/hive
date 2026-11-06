@@ -27,9 +27,13 @@ async function connect() {
     await port.open({ baudRate: 115200 })
 
     const textEncoder = new TextEncoderStream();
+    textEncoder.readable.pipeTo(port.writable);
     const writer = textEncoder.writable.getWriter();
-    send = writer.write
+    send = (msg) => writer.write(msg)
 
+    const textDecoder = new TextDecoderStream();
+    port.readable.pipeTo(textDecoder.writable);
+    const reader = textDecoder.readable.getReader();
     while (true) {
       const { value } = await reader.read();
       inbox += value
