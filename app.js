@@ -9,9 +9,9 @@ form.addEventListener("submit", (e) => {
 
 async function connect() {
   if (typeof backbone !== "undefined") {
-    backbone.peripheral(devid.value)
+    backbone.central(devid.value.split(",").map(it => it.trim()))
 
-    send = backbone.send
+    send = (msg) => backbone.send(msg + "\n")
 
     backbone.onmessage = (message, _device) => {
       inbox += message
@@ -29,7 +29,7 @@ async function connect() {
     const textEncoder = new TextEncoderStream();
     textEncoder.readable.pipeTo(port.writable);
     const writer = textEncoder.writable.getWriter();
-    send = (msg) => writer.write(msg)
+    send = (msg) => writer.write(msg + "\n")
 
     const textDecoder = new TextDecoderStream();
     port.readable.pipeTo(textDecoder.writable);
