@@ -1,5 +1,6 @@
 let port
 let inbox = ""
+let attempt = 0
 let send = async (method, payload) => {}
 
 let typst
@@ -13,7 +14,7 @@ form.addEventListener("submit", (e) => {
 })
 
 async function init() {
-  const pkg = await import("/npm/typ_js.js")
+  const pkg = await import("https://cdn.jsdelivr.net/npm/typ-js@0.2.0/typ_js.js")
   await pkg.default()
   typst = pkg.TypJs.new()
   python = await loadPyodide()
@@ -26,11 +27,8 @@ async function connect() {
     backbone.central(ids)
 
     send = (method, payload) => {
-      alert("backbone send" + JSON.stringify({method, payload, ids}))
-      const message = JSON.stringify({method, payload}) + "\n"
-      const chunks = message.match(/.{0,20}/g)
       ids.forEach(dev => {
-        chunks.forEach(chunk => backbone.send(chunk, dev))
+        backbone.send(JSON.stringify({method, payload}) + "\n", dev)
       })
     }
 
@@ -76,22 +74,27 @@ async function connect() {
 
 function tryProcess() {
   const closing = [...inbox.matchAll("}")]
-  const start = Array.from(inbox.matchAll('{"method":"')).at(-1)?.index || 0
+  attempt++
 
   for (const { index } of closing) {
     try {
-      const slice = inbox.slice(start, index+1)
-      console.log({slice})
+      const slice = inbox.slice(0, index+1)
+      console.log(slice)
       const { method, payload } = JSON.parse(slice)
       handle(method, payload)
       inbox = inbox.slice(index+1)
       return
-    } catch (_e) {}
+    } catch (_e) {
+      if (attempt > 10) {
+        inbox = ""
+        attempt = 0
+        console.log("too many attempts, resetting the buffer")
+      }
+    }
   }
 }
 
 function handle(method, payload) {
-  console.log({method, payload})
   if (method === "ui") {
     typst.add("ui.typ", new TextEncoder().encode(payload))
     render().then(() => send("buttons", buttons))
@@ -109,8 +112,7 @@ async function render() {
     if (err.length) {
       console.warn(err)
     }
-    const eMsg = err.length ? `<pre>${JSON.stringify(err, null, 4)}</pre>` : "No ui sent yet"
-    document.body.innerHTML = svg || eMsg
+    document.body.innerHTML = svg || `<pre>${JSON.stringify(err, null, 4)}</pre>`
     document.querySelectorAll("[data-typst-label]")
       .forEach(element => {
         function down() {
