@@ -73,6 +73,10 @@ async function connect() {
 }
 
 function tryProcess() {
+  if (!inbox.includes("\n")) {
+    return
+  }
+  
   attempt++
 
   inbox.split("\n").forEach(slice => {
@@ -80,7 +84,6 @@ function tryProcess() {
       console.log(slice)
       const { method, payload } = JSON.parse(slice)
       handle(method, payload)
-      inbox = inbox.slice(index+1)
       return
     } catch (_e) {
       if (attempt > 1000) {
@@ -90,6 +93,8 @@ function tryProcess() {
       }
     }
   })
+
+  inbox = ""
 }
 
 function handle(method, payload) {

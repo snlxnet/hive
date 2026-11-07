@@ -14,11 +14,17 @@
   white
 }
 
-#state
-
 #box(
   fill: color,
   inset: 2mm,
-)[Test Button] <led>
+)[LED Button] <led>
 
-updated
+#box(
+  fill: blue,
+  inset: 2mm,
+)[Test Button] <test>
+
+#if "buttons" in state {
+  state.buttons
+}
+

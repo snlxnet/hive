@@ -16,12 +16,16 @@ state = {"temperature": 21}
 send(state)
 send("ui.typ")
 print("ui sent")
+last = False
 while True:
     tick()
     state["buttons"] = buttons
-    print(state)
     try:
-        led.value = buttons["led"]
+        if buttons["led"] != led.value or buttons["test"] != last:
+            last = buttons["test"]
+            print(state)
+            send(state)
+            led.value = buttons["led"]
     except:
         pass
     # time.sleep(0.05)

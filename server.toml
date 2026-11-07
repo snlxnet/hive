@@ -1,0 +1,9 @@
+[general]
+cache-control-headers = false
+
+[advanced]
+
+[[advanced.headers]]
+source = "*.js"
+status = [200, 206, 304]
+headers = { Cache-Control = "no-store" }
