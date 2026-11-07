@@ -14,7 +14,7 @@ form.addEventListener("submit", (e) => {
 })
 
 async function init() {
-  const pkg = await import("https://cdn.jsdelivr.net/npm/typ-js@0.2.0/typ_js.js")
+  const pkg = await import("/typ_js.js")
   await pkg.default()
   typst = pkg.TypJs.new()
   python = await loadPyodide()
@@ -73,12 +73,10 @@ async function connect() {
 }
 
 function tryProcess() {
-  const closing = [...inbox.matchAll("}")]
   attempt++
 
-  for (const { index } of closing) {
+  inbox.split("\n").forEach(slice => {
     try {
-      const slice = inbox.slice(0, index+1)
       console.log(slice)
       const { method, payload } = JSON.parse(slice)
       handle(method, payload)
@@ -91,7 +89,7 @@ function tryProcess() {
         console.log("too many attempts, resetting the buffer")
       }
     }
-  }
+  })
 }
 
 function handle(method, payload) {

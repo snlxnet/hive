@@ -25,9 +25,9 @@ def send(message):
             text = json.dumps({ "method": "ui", "payload": file.read() })
 
     if usb.connected:
-        usb.uart.write(text)
+        usb.uart.write(text+"\n")
     if ble.connected:
-        ble.uart.write(text)
+        ble.uart.write(text+"\n")
 
 def process(node):
     if node.uart.in_waiting:
