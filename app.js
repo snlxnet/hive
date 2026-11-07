@@ -2,10 +2,22 @@ let port
 let inbox = ""
 let send = async (method, payload) => {}
 
+let typst
+let python
+init()
+
 form.addEventListener("submit", (e) => {
   e.preventDefault()
   connect()
 })
+
+async function init() {
+  const pkg = await import("https://cdn.jsdelivr.net/npm/typ-js@0.2.0/typ_js.js")
+  await pkg.default()
+  typst = pkg.TypJs.new()
+  python = await loadPyodide()
+  document.querySelector("button").textContent = "Connect"
+}
 
 async function connect() {
   if (typeof backbone !== "undefined") {
@@ -60,9 +72,19 @@ async function connect() {
 
 function tryProcess() {
   try {
-    const data = JSON.parse(inbox)
-    document.body.innerHTML = "<pre>" + JSON.stringify(data, null, 4) + "</pre>"
+    const { method, payload } = JSON.parse(inbox)
     inbox = ""
+
+    if (method === "ui") {
+      typst.add("ui.typ", new TextEncoder().encode(payload))
+      typst.deps("ui.typ").then(async () => {
+        const { svg, err } = await typst.svg("ui.typ")
+        document.body.innerHTML = svg || `<pre>${JSON.stringify(err, null, 4)}</pre>`
+        console.warn(err)
+      })
+    } else {
+      document.body.innerHTML = "<pre>" + JSON.stringify(data, null, 4) + "</pre>"
+    }
   } catch(e) {
     console.warn(e)
   }

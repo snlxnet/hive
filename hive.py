@@ -2,6 +2,7 @@ import json
 import time
 
 import usb_cdc
+from supervisor import runtime, RunReason
 from adafruit_ble import BLERadio
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 from adafruit_ble.services.nordic import UARTService
@@ -49,5 +50,9 @@ def start_as(name):
     adv = ProvideServicesAdvertisement(ble.uart)
     adv.complete_name = name
     ble.radio = BLERadio()
+    if runtime.run_reason == RunReason.AUTO_RELOAD:
+        ble.connected = True
+        usb.connected = runtime.usb_connected
+        send({"method": "data", "payload": "hi"})
     ble.radio.stop_advertising()
     ble.radio.start_advertising(adv)
