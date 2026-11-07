@@ -9,11 +9,23 @@ form.addEventListener("submit", (e) => {
 
 async function connect() {
   if (typeof backbone !== "undefined") {
-    backbone.central(devid.value.split(",").map(it => it.trim()))
+    const ids = devid.value.split(",").map(it => it.trim())
+    backbone.central(ids)
 
-    send = (method, payload) => backbone.send(JSON.stringify({method, payload}) + "\n")
+    send = (method, payload) => {
+      ids.forEach(dev => {
+        backbone.send(JSON.stringify({method, payload}) + "\n", dev)
+      })
+    }
 
-    backbone.onmessage = (message, _device) => {
+    let first = true
+    backbone.onmessage = async (message, _device) => {
+      if (first) {
+        first = false
+        await new Promise(res => setTimeout(res, 1000))
+        send("init")
+        return
+      }
       inbox += message
       tryProcess()
     }
@@ -47,6 +59,11 @@ async function connect() {
 }
 
 function tryProcess() {
-  console.log(inbox)
-  inbox = ""
+  try {
+    const data = JSON.parse(inbox)
+    document.body.innerHTML = "<pre>" + JSON.stringify(data, null, 4) + "</pre>"
+    inbox = ""
+  } catch(e) {
+    console.warn(e)
+  }
 }
