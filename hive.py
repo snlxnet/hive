@@ -10,6 +10,7 @@ from adafruit_ble.services.nordic import UARTService
 class HiveNode:
     def __init__(self):
         self.uart = None
+        self.buffer = bytearray()
         self.connected = False
 
 usb = HiveNode()
@@ -30,12 +31,20 @@ def send(message):
         ble.uart.write(text)
 
 def process(node):
-    if node.uart.in_waiting:
-        message = json.loads(node.uart.readline())
-        if message["method"] == "init":
-            node.connected = True
-        elif message["method"] == "buttons":
-            buttons.update(message["payload"])
+    while node.uart.in_waiting:
+        print("more")
+        node.buffer.extend(node.uart.read(32))
+        try:
+            message = json.loads(node.buffer)
+            node.buffer = bytearray()
+            print(node == ble, message)
+            if message["method"] == "init":
+                node.connected = True
+            elif message["method"] == "buttons":
+                buttons.update(message["payload"])
+        except:
+            print("partial", node.buffer)
+            pass
 
 def tick():
     process(usb)
