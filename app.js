@@ -1,5 +1,6 @@
 let port
 let inbox = ""
+let attempt = 0
 let send = async (method, payload) => {}
 
 let typst
@@ -72,39 +73,62 @@ async function connect() {
 }
 
 function tryProcess() {
-  try {
-    const { method, payload } = JSON.parse(inbox)
-    inbox = ""
+  const closing = [...inbox.matchAll("}")]
+  attempt++
 
-    if (method === "ui") {
-      typst.add("ui.typ", new TextEncoder().encode(payload))
-      typst.deps("ui.typ").then(async () => {
-        const { svg, err } = await typst.svg("ui.typ")
-        document.body.innerHTML = svg || `<pre>${JSON.stringify(err, null, 4)}</pre>`
-        console.warn(err)
-        document.querySelectorAll("[data-typst-label]")
-          .forEach(element => {
-            console.log(element)
-            function down() {
-              buttons[element.dataset.typstLabel] = true
-              send("buttons", buttons)
-            }
-            function up() {
-              buttons[element.dataset.typstLabel] = false
-              send("buttons", buttons)
-            }
-            element.onmousedown = down
-            element.ontouchstart = down
-            element.onmouseup = up
-            element.ontouchend = up
-            element.style.pointerEvents = "bounding-box"
-            up()
-          })
-      })
-    } else {
-      document.body.innerHTML = "<pre>" + JSON.stringify(data, null, 4) + "</pre>"
+  for (const { index } of closing) {
+    try {
+      const slice = inbox.slice(0, index+1)
+      console.log(slice)
+      const { method, payload } = JSON.parse(slice)
+      handle(method, payload)
+      inbox = inbox.slice(index+1)
+      return
+    } catch (_e) {
+      if (attempt > 10) {
+        inbox = ""
+        attempt = 0
+        console.log("too many attempts, resetting the buffer")
+      }
     }
-  } catch(e) {
-    console.warn(e)
   }
+}
+
+function handle(method, payload) {
+  if (method === "ui") {
+    typst.add("ui.typ", new TextEncoder().encode(payload))
+    render().then(() => send("buttons", buttons))
+  } else if (method === "data") {
+    typst.add("hive.json", new TextEncoder().encode(JSON.stringify(payload, null, 4)))
+    render()
+  } else {
+    document.body.innerHTML = "<pre>" + JSON.stringify({method, payload}, null, 4) + "</pre>"
+  }
+}
+
+async function render() {
+  return typst.deps("ui.typ").then(async () => {
+    const { svg, err } = await typst.svg("ui.typ")
+    if (err.length) {
+      console.warn(err)
+    }
+    document.body.innerHTML = svg || `<pre>${JSON.stringify(err, null, 4)}</pre>`
+    document.querySelectorAll("[data-typst-label]")
+      .forEach(element => {
+        function down() {
+          buttons[element.dataset.typstLabel] = true
+          send("buttons", buttons)
+        }
+        function up() {
+          buttons[element.dataset.typstLabel] = false
+          send("buttons", buttons)
+        }
+        element.onmousedown = down
+        element.ontouchstart = down
+        element.onmouseup = up
+        element.ontouchend = up
+        element.style.pointerEvents = "bounding-box"
+        buttons[element.dataset.typstLabel] = false
+      })
+  })
 }

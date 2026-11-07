@@ -54,6 +54,5 @@ def start_as(name):
     if runtime.run_reason == RunReason.AUTO_RELOAD:
         ble.connected = True
         usb.connected = runtime.usb_connected
-        send({"method": "data", "payload": "hi"})
     ble.radio.stop_advertising()
     ble.radio.start_advertising(adv)

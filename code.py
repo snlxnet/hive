@@ -4,10 +4,12 @@ start_as("worker-0")
 while not connected():
     pass
 print("connected")
+state = {"temperature": 21}
+send(state)
 send("ui.typ")
-# send({"temperature": 21.0})
 while True:
     tick()
-    print(buttons)
-    time.sleep(0.05)
+    state["buttons"] = buttons
+    send(state)
+    time.sleep(0.1)
 
