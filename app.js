@@ -14,7 +14,7 @@ form.addEventListener("submit", (e) => {
 })
 
 async function init() {
-  const pkg = await import("/typ_js.js")
+  const pkg = await import("/npm/typ_js.js")
   await pkg.default()
   typst = pkg.TypJs.new()
   python = await loadPyodide()
@@ -83,7 +83,7 @@ function tryProcess() {
       inbox = inbox.slice(index+1)
       return
     } catch (_e) {
-      if (attempt > 10) {
+      if (attempt > 1000) {
         inbox = ""
         attempt = 0
         console.log("too many attempts, resetting the buffer")
