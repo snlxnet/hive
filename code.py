@@ -10,31 +10,43 @@ class HiveNode:
     def __init__(self):
         self.uart = None
         self.connected = False
+        self.was_connected = False
         self.buttons = {}
 
 usb = HiveNode()
-usb.uart = usb_cdc.data
-
 ble = HiveNode()
-ble.uart = UARTService()
-ble.radio = BLERadio()
-adv = ProvideServicesAdvertisement(ble.uart)
-adv.complete_name = "hivetest"
-ble.radio.start_advertising(adv)
 
-def process(uart):
-    if uart.in_waiting:
-        message = json.loads(uart.readline())
+def process(node):
+    if node.uart.in_waiting:
+        message = json.loads(node.uart.readline())
         print(message)
-        uart.write(b"Got it.")
+        node.uart.write(b"Got it.")
+        if message["method"] == "init":
+            node.connected = True
 
-while True:
-    usb.connected = True
+    if node.connected and not node.was_connected:
+        node.uart.write(b"init sequence")
+        node.was_connected = True
+
+def tick():
     ble.connected = ble.radio.connected
+    process(usb)
+    process(ble)
 
-    process(usb.uart)
-    process(ble.uart)
-    time.sleep(0.1)
+def start_as(name):
+    usb.uart = usb_cdc.data
+    ble.uart = UARTService()
+    adv = ProvideServicesAdvertisement(ble.uart)
+    adv.complete_name = name
+    ble.radio = BLERadio()
+    ble.radio.start_advertising(adv)
+
+start_as("worker-0")
+while True:
+    tick()
+    print('usb', usb.connected)
+    print('ble', ble.connected)
+    time.sleep(0.5)
 
 
 

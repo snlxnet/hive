@@ -1,6 +1,6 @@
 let port
 let inbox = ""
-let send = async (message) => {}
+let send = async (method, payload) => {}
 
 form.addEventListener("submit", (e) => {
   e.preventDefault()
@@ -11,7 +11,7 @@ async function connect() {
   if (typeof backbone !== "undefined") {
     backbone.central(devid.value.split(",").map(it => it.trim()))
 
-    send = (msg) => backbone.send(msg + "\n")
+    send = (method, payload) => backbone.send(JSON.stringify({method, payload}) + "\n")
 
     backbone.onmessage = (message, _device) => {
       inbox += message
@@ -29,16 +29,20 @@ async function connect() {
     const textEncoder = new TextEncoderStream();
     textEncoder.readable.pipeTo(port.writable);
     const writer = textEncoder.writable.getWriter();
-    send = (msg) => writer.write(msg + "\n")
+    send = (method, payload) => writer.write(JSON.stringify({method, payload}) + "\n")
+    setTimeout(() => send("init"), 500)
 
     const textDecoder = new TextDecoderStream();
     port.readable.pipeTo(textDecoder.writable);
     const reader = textDecoder.readable.getReader();
-    while (true) {
-      const { value } = await reader.read();
-      inbox += value
-      tryProcess()
-    }
+
+    new Promise(async () => {
+      while (true) {
+        const { value } = await reader.read();
+        inbox += value
+        tryProcess()
+      }
+    })
   }
 }
 
