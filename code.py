@@ -8,7 +8,6 @@ send("ui.typ")
 # send({"temperature": 21.0})
 while True:
     tick()
-    time.sleep(0.5)
-
-
+    print(buttons)
+    time.sleep(0.05)
 

@@ -11,10 +11,10 @@ class HiveNode:
     def __init__(self):
         self.uart = None
         self.connected = False
-        self.buttons = {}
 
 usb = HiveNode()
 ble = HiveNode()
+buttons = {}
 
 def send(message):
     text = ""
@@ -32,9 +32,10 @@ def send(message):
 def process(node):
     if node.uart.in_waiting:
         message = json.loads(node.uart.readline())
-        print(message)
         if message["method"] == "init":
             node.connected = True
+        elif message["method"] == "buttons":
+            buttons.update(message["payload"])
 
 def tick():
     process(usb)

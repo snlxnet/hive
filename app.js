@@ -4,6 +4,7 @@ let send = async (method, payload) => {}
 
 let typst
 let python
+let buttons = {}
 init()
 
 form.addEventListener("submit", (e) => {
@@ -81,6 +82,24 @@ function tryProcess() {
         const { svg, err } = await typst.svg("ui.typ")
         document.body.innerHTML = svg || `<pre>${JSON.stringify(err, null, 4)}</pre>`
         console.warn(err)
+        document.querySelectorAll("[data-typst-label]")
+          .forEach(element => {
+            console.log(element)
+            function down() {
+              buttons[element.dataset.typstLabel] = true
+              send("buttons", buttons)
+            }
+            function up() {
+              buttons[element.dataset.typstLabel] = false
+              send("buttons", buttons)
+            }
+            element.onmousedown = down
+            element.ontouchstart = down
+            element.onmouseup = up
+            element.ontouchend = up
+            element.style.pointerEvents = "bounding-box"
+            up()
+          })
       })
     } else {
       document.body.innerHTML = "<pre>" + JSON.stringify(data, null, 4) + "</pre>"
