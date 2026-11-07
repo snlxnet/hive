@@ -32,17 +32,22 @@ def send(message):
 
 def process(node):
     while node.uart.in_waiting:
-        node.buf += node.uart.read(30)
-        try:
-            message = json.loads(str(node.buf, 'utf-8').split("\n")[0])
-            print(message)
-            node.buf = b""
-            if message["method"] == "init":
-                node.connected = True
-            elif message["method"] == "buttons":
-                buttons.update(message["payload"])
-        except:
-            print("chunk", str(node.buf, 'utf-8'))
+        node.buf += node.uart.read(1)
+        lines = str(node.buf, 'utf-8').split("\n")
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                message = json.loads(line)
+                print(message)
+                node.buf = b""
+                if message["method"] == "init":
+                    node.connected = True
+                elif message["method"] == "buttons":
+                    buttons.update(message["payload"])
+            except:
+                print("chunk", str(node.buf, 'utf-8'), 'end')
 
 def tick():
     process(usb)

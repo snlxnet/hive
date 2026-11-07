@@ -95,7 +95,7 @@ function tryProcess() {
 function handle(method, payload) {
   if (method === "ui") {
     typst.add("ui.typ", new TextEncoder().encode(payload))
-    render().then(() => send("buttons", buttons))
+    render()
   } else if (method === "data") {
     typst.add("hive.json", new TextEncoder().encode(JSON.stringify(payload, null, 4)))
     render()

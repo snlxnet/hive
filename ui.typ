@@ -1,3 +1,5 @@
+#set page(width: 7cm, height: 14cm)
+
 = Hello from CircuitPython!
 
 #let state = json("hive.json")
