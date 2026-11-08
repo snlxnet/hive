@@ -64,7 +64,6 @@ def start_as(name):
     adv.complete_name = name
     ble.radio = BLERadio()
     if runtime.run_reason == RunReason.AUTO_RELOAD:
-        ble.connected = True
         usb.connected = runtime.usb_connected
     ble.radio.stop_advertising()
     ble.radio.start_advertising(adv)
