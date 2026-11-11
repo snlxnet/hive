@@ -11,5 +11,21 @@ svg * {
   100% { transform: rotate(360deg) }
 }
 </style>
-<script src="/svg-experiments.js">
+<script src="/svg.js">
+</script>
+<script>
+main()
+async function main() {
+  const res = await fetch("/test-ui.svg")
+  const svg = await res.text()
+  document.body.innerHTML = svg
+  spin("bee")
+  sub("tab1", () => set("tabs", 1))
+  sub("tab2", () => set("tabs", 2))
+  sub("tab3", () => set("tabs", 3))
+  sub("toggle-vacuum", () => console.log("vrrrr"))
+  sub("home-position", () => console.log("G28"))
+  set("board_name", "javascript :)")
+  set("tabs", 1)
+}
 </script>
