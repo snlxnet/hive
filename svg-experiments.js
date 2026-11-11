@@ -12,6 +12,17 @@ function set(key, value) {
   }
 }
 
+function sub(key, hold, release) {
+  const element = findLabel(key)
+  element.addEventListener("mousedown", hold)
+  element.addEventListener("mouseup", release)
+  element.addEventListener("touchstart", hold)
+  element.addEventListener("touchend", release)
+  element.style.pointerEvents = "bounding-box"
+}
+
+// todo add spin fn
+
 function showChild(parent, idx) {
   Array.from(parent.children)
     .reverse()
