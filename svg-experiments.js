@@ -21,7 +21,12 @@ function sub(key, hold, release) {
   element.style.pointerEvents = "bounding-box"
 }
 
-// todo add spin fn
+function spin(key, duration=60) {
+  const element = findLabel(key)
+  element.style.transformOrigin = "center"
+  element.style.transformBox = "fill-box"
+  element.style.animation = duration + "s linear 0s infinite normal none running spin"
+}
 
 function showChild(parent, idx) {
   Array.from(parent.children)
@@ -44,4 +49,10 @@ async function main() {
   const res = await fetch("/test-ui.svg")
   const svg = await res.text()
   document.body.innerHTML = svg
+  spin("bee")
+  sub("tab1", () => set("tabs", 1))
+  sub("tab2", () => set("tabs", 2))
+  sub("tab3", () => set("tabs", 3))
+  set("board_name", "javascript :)")
+  set("tabs", 1)
 }
